@@ -23,6 +23,9 @@ private
     ℓ ℓ' : Level
 
 
+{- For each ordinal α, 𝕁 α will be the domain of Diagram α defined below
+   An element of 𝕁 α encodes a finite subset of α -}
+
 𝕁 : Ord ℓ-zero ℓ-zero → Type ℓ-zero
 𝕁 α = Σ[ n ∈ ℕ ] (OrdWildCat ℓ-zero ℓ-zero [ FinIsOrd n , α ])
 
@@ -57,6 +60,11 @@ private
     squash₁ (lemComp x y z ∣ f ∣₁ g) (lemComp x y z ∣ f ∣₁ g') i
   lemComp x y z (squash₁ f f' i) g = squash₁ (lemComp x y z f g) (lemComp x y z f' g) i
 
+
+{- For each ordinal α, we define the functor Diagram α from 𝕁 α to Ord
+   Diagram α decodes an element of 𝕁 α into a finite subset of α
+
+   This functor will be used as a diagram for which α is shown to be a colimit -}
 
 DiagramObj : (α : Ord ℓ-zero ℓ-zero) → 𝕁 α → Ord ℓ-zero ℓ-zero
 DiagramObj α (n , f) = (Σ[ x ∈ typeOf α ] ∥ Σ[ k ∈ Fin n ] (fst f k ≡ x)  ∥₁) ,

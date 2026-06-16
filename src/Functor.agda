@@ -26,7 +26,12 @@ open ColimCocone
 private
   variable
     ℓ₁ ℓ₂ : Level
+    ℓC ℓC' ℓD ℓD' ℓE ℓE' : Level
 
+
+_∘WFun_ : {C : WildCat ℓC ℓC'} {D : WildCat ℓD ℓD'} {E : WildCat ℓE ℓE'} →
+          (G : WildFunctor D E) (F : WildFunctor C D) → WildFunctor C E
+G ∘WFun F = comp-WildFunctor F G
 
 isFunctorPreserveColim : {ℓC ℓC' ℓD ℓD' ℓJ ℓJ' : Level}
                          {C : WildCat ℓC ℓC'} {D : WildCat ℓD ℓD'} {J : WildCat ℓJ ℓJ'}
@@ -35,6 +40,9 @@ isFunctorPreserveColim : {ℓC ℓC' ℓD ℓD' ℓJ ℓJ' : Level}
 isFunctorPreserveColim {D = D} F G =
   (c : ColimCocone G) →
   Σ[ c' ∈ ColimCocone (F ∘WFun G) ] WildCatIso D (F-ob F (colim c)) (colim c')
+
+
+-- The forgetful functor Ord → WF preserves colimits for Diagram
 
 OrdToWFPC : (α : Ord ℓ-zero ℓ-zero) → isFunctorPreserveColim OrdToWF (Diagram α)
 OrdToWFPC α colimForDiagram =
@@ -173,6 +181,8 @@ OrdToWFPC α colimForDiagram =
                  (snd f))
 
 
+-- equal≺ω F G α says that the endofunctors F and G on WF have the same behaviour on the finite subsets of α
+
 equal≺ω : (F G : WildFunctor (WFWildCat ℓ-zero ℓ-zero) (WFWildCat ℓ-zero ℓ-zero))
           (α : Ord ℓ-zero ℓ-zero) → Type (ℓ-suc ℓ-zero)
 equal≺ω F G α =
@@ -192,6 +202,9 @@ equal≺ωSym F G α equal =
                 transportCancel (λ f → WFWildCat ℓ-zero ℓ-zero [ f u , f s ])
                                 (fst equal)
                                 (F-hom (F ∘WFun (OrdToWF ∘WFun Diagram α)) h)
+
+
+-- three lemmas for dilatingProperty
 
 transportLemma : {ℓC ℓC' ℓ₁ ℓ₂ : Level} (C : WildCat ℓC ℓC') {f g : ob C → ob (WFWildCat ℓ₁ ℓ₂)}
                  (p : f ≡ g) →
@@ -244,6 +257,9 @@ cancelLemma C {a} = J (λ b p → concatMor C {b} {a} {b}
                        cong (comp' C {a} {a} {a} (id C {a}))
                             (transportRefl (id C {a})) ∙
                        ⋆IdL C (id C {a}))
+
+
+-- The following property says that if the endofunctors F and G on WF have the same behaviour on the finite subsets of α, then F α ≡ G α holds
 
 dilatingProperty : {F G : WildFunctor (WFWildCat ℓ-zero ℓ-zero) (WFWildCat ℓ-zero ℓ-zero)} →
                    ((α : Ord ℓ-zero ℓ-zero) → isFunctorPreserveColim F (OrdToWF ∘WFun (Diagram α)) ×

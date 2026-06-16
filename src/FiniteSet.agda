@@ -20,6 +20,9 @@ private
     ℓ ℓ' : Level
     n : ℕ
 
+
+-- the type Fin of finite ordinals satisfying linearity
+
 Fin : (n : ℕ) → Type
 Fin zero = ⊥
 Fin (suc n) = Fin n ⊎ Unit

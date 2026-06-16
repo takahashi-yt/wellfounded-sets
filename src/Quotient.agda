@@ -29,13 +29,21 @@ private
     ℓ ℓ' : Level
 
 
+-- the binary relation ≈ on the disjoint union of finite subsets of α which are obtained from Diagram α
+
 ≈ : (α : Ord ℓ-zero ℓ-zero) (x y : Σ[ a ∈ 𝕁 α ] (typeOf (DiagramObj α a))) → Type ℓ-zero
 ≈ α (u , x) (t , y) =
   ∥  Σ[ s ∈ 𝕁 α ] (Σ[ h₁ ∈ 𝕁WildCat α [ u , s ] ] (Σ[ h₂ ∈ 𝕁WildCat α [ t , s ] ]
        (fst (DiagramHom α {u} {s} h₁) x ≡ fst (DiagramHom α {t} {s} h₂) y))) ∥₁
 
+
+-- the set-quotient ∐ α
+
 ∐ : (α : Ord ℓ-zero ℓ-zero) → Type ℓ-zero
 ∐ α = (Σ[ a ∈ 𝕁 α ] (typeOf (DiagramObj α a))) Q./ (≈ α)
+
+
+-- The ordering ≺Quo on ∐ α is prop-valued
 
 ≺QuoHProp : (α : Ord ℓ-zero ℓ-zero) (x y : ∐ α) → hProp ℓ-zero
 ≺QuoHProp α v w =
@@ -83,6 +91,9 @@ private
 ≺Quo : (α : Ord ℓ-zero ℓ-zero) (x y : ∐ α) → Type ℓ-zero
 ≺Quo α x y = fst (≺QuoHProp α x y)
 
+
+-- For each ordinal α, ∐ α is a well-founded set
+
 ∐IsWF : Ord ℓ-zero ℓ-zero → WF ℓ-zero ℓ-zero
 ∐IsWF α = ∐ α , ≺Quo α , (λ v w → snd (≺QuoHProp α v w)) , wfLem₂ , transLem , Q.squash/
   where
@@ -105,6 +116,9 @@ private
              (λ v _ u → isPropΠ2 (λ _ _ → snd (≺QuoHProp α v u)))
              λ (c₁ , x₁ , s₁) (c₂ , x₂ , s₂) (c₃ , x₃ , s₃) →
                transitivityOf α x₁ x₂ x₃
+
+
+-- We show α ≃ ∐ α
 
 biInvEquiv∐ : (α : Ord ℓ-zero ℓ-zero) → BiInvEquiv (typeOf α) (∐ α)
 biInvEquiv∐ α = biInvEquiv f g gisSection g λ _ → refl
@@ -148,6 +162,9 @@ biInvEquiv∐ α = biInvEquiv f g gisSection g λ _ → refl
 
 α≃∐α : (α : Ord ℓ-zero ℓ-zero) → (typeOf α) ≃ ∐ α
 α≃∐α α = biInvEquiv→Equiv-right (biInvEquiv∐ α)
+
+
+-- We show that an ordinal α as a well-founded set is isomorphic to ∐ α, which implies α ≡ ∐ α 
 
 α≡∐αForType : (α : Ord ℓ-zero ℓ-zero) → (typeOf α) ≡ ∐ α
 α≡∐αForType α = ua (α≃∐α α)

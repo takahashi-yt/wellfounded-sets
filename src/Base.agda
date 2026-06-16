@@ -22,12 +22,6 @@ open WildFunctor
 private
   variable
     ℓ ℓ' ℓ₁ ℓ₂ : Level
-    ℓC ℓC' ℓD ℓD' ℓE ℓE' : Level
-
-
-_∘WFun_ : {C : WildCat ℓC ℓC'} {D : WildCat ℓD ℓD'} {E : WildCat ℓE ℓE'} →
-          (G : WildFunctor D E) (F : WildFunctor C D) → WildFunctor C E
-G ∘WFun F = comp-WildFunctor F G
 
 
 isMonotone : {A : Type ℓ} {B : Type ℓ₁} (_≺A_ : Rel A A ℓ') (_≺B_ : Rel B B ℓ₂) →
@@ -37,6 +31,8 @@ isMonotone {A = A} {B = B} _≺A_ _≺B_ f = (x y : A) → x ≺A y → (f x) �
 isExtensional : {A : Type ℓ} (_≺_ : Rel A A ℓ') → Type (ℓ-max ℓ ℓ')
 isExtensional {A = A} _≺_  = (x y : A) → ((z : A) → (z ≺ x → z ≺ y) × (z ≺ y → z ≺ x)) → x ≡ y
 
+
+-- the type of ordinals
 
 Ord : (ℓ ℓ' : Level) → Type (ℓ-suc (ℓ-max ℓ ℓ'))
 Ord ℓ ℓ' = Σ[ A ∈ Type ℓ ] Σ[ _≺_ ∈ (A → A → Type ℓ') ]
@@ -73,7 +69,6 @@ isMonoIsProp : (α β : Ord ℓ ℓ') (f : typeOf α → typeOf β) →
                 isProp (isMonotone (orderOf α) (orderOf β) f)
 isMonoIsProp α β f = isPropΠ2 λ x y → isPropΠ λ _ → propValuednessOf β (f x) (f y) 
 
-
 preOrder : (α : Ord ℓ ℓ') (x y : typeOf α) → Type (ℓ-max ℓ ℓ')
 preOrder α x y = (z : typeOf α) → orderOf α z x → orderOf α z y
 
@@ -81,11 +76,13 @@ poIsProp : (α : Ord ℓ ℓ') → isPropValued (preOrder α)
 poIsProp α x y = isPropΠ λ z → isPropΠ λ z≺x → propValuednessOf α z y
 
 preOrderRel : (α : Ord ℓ ℓ') → Rel (typeOf α) (typeOf α) (ℓ-max ℓ ℓ')
-preOrderRel α = preOrder α
+preOrderRel = preOrder
+
 
 {- As Escardó observed, the prop-valuedness and extensionality of an ordinal imply that it is a set
    cf. Martín H. Escardó et al. Ordinals in univalent type theory in Agda notation, 2018. Agda development,
    URL: https://www.cs.bham.ac.uk/~mhe/TypeTopology/Ordinals.index.html -}
+   
 ordIsSet : {ℓ ℓ' : Level} (α : Ord ℓ ℓ') → isSet (typeOf α)
 ordIsSet {ℓ} {ℓ'} α = reflPropRelImpliesIdentity→isSet
                ≼×≽
@@ -96,6 +93,9 @@ ordIsSet {ℓ} {ℓ'} α = reflPropRelImpliesIdentity→isSet
   ≼×≽ : (x y : typeOf α) → Type (ℓ-max ℓ ℓ')
   ≼×≽ x y = preOrder α x y × preOrder α y x
   
+
+{- the type of well-founded sets
+   Note that we explicitly impose the condition that A is an h-set -}
 
 WF : (ℓ ℓ' : Level) → Type (ℓ-suc (ℓ-max ℓ ℓ'))
 WF ℓ ℓ' = Σ[ A ∈ Type ℓ ] Σ[ _≺_ ∈ (A → A → Type ℓ') ]
@@ -130,6 +130,8 @@ ordAsWF : Ord ℓ ℓ' → WF ℓ ℓ'
 ordAsWF α = typeOf α , orderOf α , propValuednessOf α , wellFoundednessOf α , transitivityOf α , ordIsSet α
 
 
+-- the category of ordinals and the category of well-founded sets
+
 module _ (ℓ ℓ' : Level) where
 
   OrdWildCat : WildCat (ℓ-suc (ℓ-max ℓ ℓ')) (ℓ-max ℓ ℓ')
@@ -152,12 +154,17 @@ module _ (ℓ ℓ' : Level) where
   WFWildCat .⋆IdR _ = refl
   WFWildCat .⋆Assoc _ _ _ = refl
 
+
+-- the forgetful functor from Ord to WF
+
 OrdToWF : WildFunctor (OrdWildCat ℓ ℓ') (WFWildCat ℓ ℓ')
 OrdToWF .F-ob α = ordAsWF α
 OrdToWF .F-hom u = u
 OrdToWF .F-id = refl
 OrdToWF .F-seq _ _ = refl
 
+
+-- two transport lemmas for isoToIdWF below
 
 transportCancel : {A : Type ℓ} (P : A → Type ℓ') {a b : A} (p : a ≡ b) (x : P a) →
                   transport (λ i → P (p (~ i))) (transport (λ i → P (p i)) x) ≡ x
@@ -187,6 +194,8 @@ transportRelLemma _ _ _ _ _ = (λ u → u) , λ u → u
 --         fst (transport (λ i → Σ-syntax (Rel (p i) (p i) ℓ₁) λ R → C i R) X) b₁ b₂))
 --     (λ _ _ _ _ → (λ u → u) , λ u → u) p
 
+
+-- Two isomorphic well-founded sets are identical
 
 isoToIdWF : {ℓ ℓ' : Level} {α β : WF ℓ ℓ'} → WildCatIso (WFWildCat ℓ ℓ') α β → α ≡ β
 isoToIdWF {ℓ} {ℓ'} {α} {β} α≅β =

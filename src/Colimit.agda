@@ -99,6 +99,8 @@ module _ {ℓJ ℓJ' ℓC ℓC' : Level} {J : WildCat ℓJ ℓJ'} {C : WildCat �
 open ColimCocone
 
 
+-- A colimit in a wild category is unique up to isomorphism
+
 colimUnique : {ℓJ ℓJ' ℓC ℓC' : Level} {J : WildCat ℓJ ℓJ'} {C : WildCat ℓC ℓC'} (D : WildFunctor J C) →
               (c c' : ColimCocone D) → WildCatIso C (colim c) (colim c')
 colimUnique D c c' .mor = colimArrow c (colim c') (colimCocone c')
@@ -131,6 +133,9 @@ colimUnique {C = C} D c c' .ret =
                                      (colimArrowCommutes c (colim c') (colimCocone c') v) ∙
                                 colimArrowCommutes c' (colim c) (colimCocone c) v) ∙
   colimArrowUnique c (colim c) (colimCocone c) (id C {colim c}) (idIsCoconeMor (colimCocone c))
+
+
+-- We show that α is a colimit for Diagram α
 
 ordIsCocone : (α : Ord ℓ-zero ℓ-zero) → Cocone (Diagram α) α
 ordIsCocone α = cocone (λ x → (λ a → fst a) , λ _ _ → λ u → u) λ _ → refl
