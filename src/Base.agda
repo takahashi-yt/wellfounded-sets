@@ -181,18 +181,16 @@ transportRelLemma : {ℓ₁ ℓ₂ : Level} {A : Type ℓ} {B : Type ℓ}
                       fst X (transport (sym p) b₁) (transport (sym p) b₂)) ×
                     (fst X (transport (sym p) b₁) (transport (sym p) b₂) →
                       fst (transport (λ i → Σ[ R ∈ Rel (p i) (p i) ℓ₁ ] (C i R)) X) b₁ b₂)
-transportRelLemma _ _ _ _ _ = (λ u → u) , λ u → u
--- another proof using J-induction
--- transportRelLemma {ℓ₁ = ℓ₁} {ℓ₂ = ℓ₂} {A = A} p =
---   J (λ B p →
---       (C : (i : I) → Rel (p i) (p i) ℓ₁ → Type ℓ₂)
---       (X : Σ-syntax (Rel A A ℓ₁) λ R → C i0 R) (b₁ b₂ : B) →
---       (fst (transport (λ i → Σ-syntax (Rel (p i) (p i) ℓ₁) λ R → C i R) X) b₁ b₂ →
---         fst X (transport (sym p) b₁) (transport (sym p) b₂))
---       ×
---       (fst X (transport (sym p) b₁) (transport (sym p) b₂) →
---         fst (transport (λ i → Σ-syntax (Rel (p i) (p i) ℓ₁) λ R → C i R) X) b₁ b₂))
---     (λ _ _ _ _ → (λ u → u) , λ u → u) p
+transportRelLemma {ℓ₁ = ℓ₁} {ℓ₂ = ℓ₂} {A = A} p =
+  J (λ B p →
+      (C : (i : I) → Rel (p i) (p i) ℓ₁ → Type ℓ₂)
+      (X : Σ-syntax (Rel A A ℓ₁) λ R → C i0 R) (b₁ b₂ : B) →
+      (fst (transport (λ i → Σ-syntax (Rel (p i) (p i) ℓ₁) λ R → C i R) X) b₁ b₂ →
+        fst X (transport (sym p) b₁) (transport (sym p) b₂))
+      ×
+      (fst X (transport (sym p) b₁) (transport (sym p) b₂) →
+        fst (transport (λ i → Σ-syntax (Rel (p i) (p i) ℓ₁) λ R → C i R) X) b₁ b₂))
+    (λ _ _ _ _ → (λ u → u) , λ u → u) p
 
 
 -- Two isomorphic well-founded sets are identical
